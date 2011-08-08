@@ -228,6 +228,7 @@ int has_json_string_decode(char *input, size_t length,
             } else {
                 if(c == '"') c = '\"';
                 else if(c == '\\') c = '\\';
+                else if(c == '\'') c = '\'';
                 else if(c == 'b') c = '\b';
                 else if(c == 'f') c = '\f';
                 else if(c == 'n') c = '\n';

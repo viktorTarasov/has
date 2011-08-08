@@ -6,6 +6,7 @@
 #include <openssl/evp.h>
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
+#include <openssl/pem.h>
 
 static const char *hexdigits = "0123456789ABCDEF";
 static void hexdump(char *out, unsigned char *in, size_t l)

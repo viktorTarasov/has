@@ -18,7 +18,9 @@ int main(int argc, char **argv)
         "\"delta\": { "
         "\"echo\": 1.0,"
         "\"foxtrot\": 3.1415,"
-        "\"golf\":\"éé\""
+        "\"golf\":\"éé\","
+	"\"cn1\":\"'\","
+	"\"cn2\":\"\'\""
         "}}";
     has_t *json1, *json2;
     char *out1 = NULL, *out2 = NULL;
