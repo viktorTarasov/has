@@ -214,11 +214,43 @@ has_t *has_x509_extensions(STACK_OF(X509_EXTENSION) *exts)
 
     for(i = 0; i < j; i++) {
         has_t *cur = has_hash_new(4);
-		X509_EXTENSION *ex = sk_X509_EXTENSION_value(exts, i);
+	X509_EXTENSION *ex = sk_X509_EXTENSION_value(exts, i);
+	char *str, *ptr, *cp;
+	int num;
+
         ASN1_OBJECT *obj = X509_EXTENSION_get_object(ex);
         has_t *critical = has_int_new(X509_EXTENSION_get_critical(ex) ? 1 : 0);
         has_hash_set_str(cur, "critical", critical);
-        has_hash_set_str(cur, "value", has_string_new_str_o(ext_dump(ex), 1));
+	str = ext_dump(ex);
+
+	/* get number of tokens */
+	ptr = strdup(str);
+	for (num = 0, cp = strtok (ptr, "\n"); cp; num++)
+		cp = strtok (NULL, "\n");
+	free(ptr);
+
+	if (num == 1)   {
+		/* 'string' has element for the unique token */
+        	has_hash_set_str(cur, "value", has_string_new_str_o(str, 1));
+	}
+	else {
+		/* array of 'string' elements for the non-unique tokens */
+		has_t *value = has_array_new(num);
+		ptr = strdup(str);
+		for (cp = strtok (ptr, "\n"); cp; )   {
+			char *elem = strdup(cp);
+
+			while(isspace(*elem) || isblank(*elem))
+				memcpy(elem, elem+1, strlen(elem));
+			while(isspace(*(elem + strlen(elem) - 1)) || isblank(*(elem + strlen(elem) - 1)))
+				*(elem + strlen(elem) - 1) = '\0';
+			has_array_push(value, has_string_new_str_o(elem, 1));
+
+			cp = strtok (NULL, "\n");
+		}
+		free(ptr);
+	        has_hash_set_str(cur, "value", value);
+	}
         has_hash_set_str_o(r, oid2string(obj), cur, 1);
     }
     return r;
