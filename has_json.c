@@ -234,7 +234,7 @@ int has_json_string_decode(char *input, size_t length,
                 else if(c == 'n') c = '\n';
                 else if(c == 'r') c = '\r';
                 else if(c == 't') c = '\t';
-                else return -1;
+		else n[written++] = '\\';      /* keep backslash for the other caracters */
                 processed += 2;
                 n[written++] = c;
             }
