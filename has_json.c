@@ -460,8 +460,23 @@ int has_json_string_encode(has_json_serializer_t *s,
                 l = 6;
             } else if(c > 0x80) {
                 int32_t codepoint = 0;
-                if(((m = decode_utf8(input + stop, length - stop, &codepoint)) < 0) ||
-                   ((l = has_json_encode_unicode(codepoint, unicode)) < 0)) {
+
+		m = decode_utf8(input + stop, length - stop, &codepoint);
+		if (m < 0)   {
+			/* UTF8 decoding failed,
+			 * let's consider this caracter as high ASCII MSC caracter 
+			 */
+			char tmp[2] = {0xC0 | (c >> 6), 0x80 | (c & 0x3F)};
+			m = decode_utf8(tmp, 2, &codepoint);
+			if (m==2)
+				m = 1;
+			else 
+				m = -1;
+		}
+
+		if (m >= 0)
+			l = has_json_encode_unicode(codepoint, unicode);
+		if (m < 0 || l < 0)   {
                     return -1;
                 }
                 add = unicode;
