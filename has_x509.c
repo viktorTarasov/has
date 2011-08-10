@@ -306,8 +306,10 @@ has_t *has_x509_new(X509 *x509)
     /* Serial number */
     if(r) {
         ASN1_INTEGER *sn = X509_get_serialNumber(x509);
-        char *serial = calloc(2 * sn->length + 1, 1);
-        hexdump(serial, sn->data, sn->length);
+        char *serial = calloc(2 * sn->length + 2, 1);
+
+        *serial = '-';
+        hexdump(serial + ((sn->type & V_ASN1_NEG) ? 1 : 0), sn->data, sn->length);
         while(*serial == '0' && strlen(serial) > 0)
             memcpy(serial, serial+1, strlen(serial));
         r = has_hash_set_str(crt, "serial", has_string_new_str_o(serial, 1));
